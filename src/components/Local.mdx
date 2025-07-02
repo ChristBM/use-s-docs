@@ -1,0 +1,17 @@
+# Local State
+
+```tsx showLineNumbers copy {4}
+import { useS } from "use-s-react";
+
+export default function Component() {
+  const [count, setCount] = useS(0); // like useState
+
+   return (
+    <button
+      onClick={() => setCount((prev) => prev + 1)}
+    >
+      You clicked {count} times
+    </button>
+  );
+}
+```

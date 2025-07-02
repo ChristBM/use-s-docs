@@ -1,0 +1,109 @@
+# API Reference
+
+The `useS` hook offers a powerful yet minimal API to manage both **local** and **global** state in React — with built-in immutability and TypeScript support.
+
+---
+
+## 🧠 `useS(initialValue: T)`
+
+Creates a **local** state, just like `useState`, but with enhanced capabilities:
+
+```ts copy /useS/ /number/ /initialValue/
+const [state, setState] = useS(0);
+```
+
+- State type is automatically inferred from the `initialValue`.
+- Supports primitives, objects, arrays, `Map`, `Set`, `Date`, `RegExp`, and more.
+- Automatically applies immutability under the hood.
+
+---
+
+## 🌍 `useS({ value: T, key: string })`
+
+Creates a **global** state shared across all components using the same `key`.
+
+```ts copy
+const [count, setCount] = useS({
+  value: 0,
+  key: "global-counter",
+});
+```
+
+This is functionally identical to local state, but allows cross-component sharing.
+
+### 🔑 Global State Rules
+
+- `key` must be a **non-empty unique string**.
+- The **first call** to `useS()` with a given key sets the **initial value**.
+- All subsequent calls with the same key:
+  - Share the **same state**.
+  - **Ignore** the `value` parameter.
+- This ensures state consistency without conflicts or duplication — regardless of where or how many times the key is used.
+
+---
+
+## 🧬 Built-In Immutability
+
+`useS` performs deep, optimized cloning so you can update nested state safely and declaratively — no need to mutate or manually deep merge.
+
+```ts copy /count/
+const initialValue = {
+  game: "Call Of useS",
+  info: {
+    count: 0,
+    points: [2, 6, 3, 4],
+  },
+  players: 10,
+};
+```
+
+### Update with direct override:
+
+```ts copy /count/
+setGameStats({ info: { count: 0 } });
+```
+
+### Or with a functional update:
+
+```ts copy /prev/
+setGameStats((prev) => ({
+  info: {
+    count: prev.info.count + 1,
+  },
+}));
+```
+
+---
+
+## ✅ Supported Value Types
+
+You can store and update the following safely:
+
+- Primitives: `string`, `number`, `boolean`, `null`, `undefined`
+- Arrays
+- Plain objects (deep merge supported)
+- Complex types: `Map`, `Set`, `Date`, `RegExp`
+- **Functions** as object properties (they are preserved)
+
+---
+
+## Summary
+
+| Feature                          | Status      | Notes                                                                 |
+|----------------------------------|-------------|-----------------------------------------------------------------------|
+| Local state                      | ✅ Complete | Same API as `useState`                                                |
+| Global state                     | ✅ Complete | Shared by `key`, no Provider required                                 |
+| TypeScript support               | ✅ Complete | Fully inferred, no manual typing needed                               |
+| Automatic immutability           | ✅ Complete | Deep cloning with performance optimizations                           |
+| Derived state support            | ✅ Complete | Supports computed state via function properties                       |
+| React 18 compatibility           | ✅ Complete | Uses `useSyncExternalStore`                                           |
+| Web & React Native               | ✅ Complete | Compatible with both                                                  |
+| Bundle size                      | ✅ Tiny     | Less than 2KB (min + gzip)                                            |
+| Boilerplate-free                 | ✅ Complete | No context, no Provider, no setup                                     |
+| DevTools/debugging               | ⚠️ Partial  | `debugGlobalStore()` available via console                            |
+| Built-in persistence             | ❌ Not yet  | Planned for future versions                                           |
+
+---
+
+Ready to see it in action?
+Explore real-world [Examples](/docs/examples) to see how `useS` can simplify your components.

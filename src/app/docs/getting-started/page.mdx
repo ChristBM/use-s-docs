@@ -1,0 +1,87 @@
+# Getting Started
+
+Welcome to `use-s-react`!
+This guide will walk you through installing the library and using it for both **local** and **global** state management — all with the simplicity of `useState`.
+
+---
+
+## 📦 Installation
+
+Install via npm (or your preferred package manager):
+
+```bash copy
+npm i use-s-react
+```
+
+---
+
+## 🔍 Importing the Hook
+
+Start by importing the hook into your component:
+
+```ts copy
+import { useS } from "use-s-react";
+```
+
+---
+
+## ⚡ Using Local State
+
+Using `useS` for local state feels just like `useState` — but with more power under the hood:
+
+```tsx showLineNumbers filename="LocalCounter.tsx" copy /useS/
+import { useS } from "use-s-react";
+
+export default function LocalCounter() {
+  const [count, setCount] = useS(0);
+
+  return (
+    <button onClick={() => setCount((prev) => prev + 1)}>
+      You clicked {count} times
+    </button>
+  );
+}
+```
+
+---
+
+## 🌍 Using Global State (The Easy Way)
+
+Want to share state across components?
+Just pass a unique `key` along with your `value`. All components using the same `key` will share the same state.
+
+```tsx showLineNumbers filename="GlobalCounter.tsx" copy /key/ /value/
+import { useS } from "use-s-react";
+
+export default function GlobalCounter() {
+  const [count, setCount] = useS({ value: 0, key: "global-counter" });
+
+  return (
+    <button onClick={() => setCount((prev) => prev + 1)}>
+      You clicked {count} times
+    </button>
+  );
+}
+```
+
+Try this line in another component:
+
+```tsx copy
+const [count, setCount] = useS({ value: 0, key: "global-counter" });
+```
+
+You'll see both components stay perfectly in sync — **no context required**.
+
+---
+
+## 🎉 That’s It!
+
+No context.
+No providers.
+No boilerplate.
+Just powerful state in **one line**.
+
+---
+
+🔎 Ready to go deeper?
+Check out the [API Reference](/docs/api) to explore everything `useS` can do.

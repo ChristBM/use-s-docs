@@ -1,0 +1,101 @@
+# use-s-react
+
+[info]
+name = use-s-react
+description = "A React hook for simple, scalable, immutable local and global state management, built on useSyncExternalStore"
+version = "2.x"
+
+[api]
+functions = ["useS", "debugGlobalStore"]
+types = ["InitialValue"]
+
+[usage]
+overview = """
+useS(initialValue: T): local state (like useState but immutable and supports deep structures).
+useS({ value: T, key: string }): global state across components using same key.
+debugGlobalStore(options?): inspect global state in console.
+"""
+patterns = """
+// Local state
+const [state, setState] = useS(initialVal);
+
+// Global state
+const [g, setG] = useS({ value: initialVal, key: "my-key" });
+
+// Derived state
+const initial = { cart: [...], total: cart => sum(cart), thanks: total => `Thanks ${total}` };
+const [{ cart, total, thanks }, setState] = useS(initial);
+
+// Executable state (components/functions in state)
+const store = {
+  exec: { value: { show: false, C: () => <A/>, D: () => <B /> }, key: 'exec-key' }
+};
+const [{ show, C, D }, setState] = useS(store.exec);
+"""
+
+[examples]
+localState = """
+import { useS } from "use-s-react";
+function Comp() {
+  const [flag, setFlag] = useS(false);
+  return <button onClick={() => setFlag(!flag)}>{flag + ""}</button>;
+}
+"""
+globalState = """
+import { useS } from "use-s-react";
+import { store } from "./store";
+function A() {
+  const [cnt, setCnt] = useS(store.globalCounter);
+  return <button onClick={() => setCnt(c => c + 1)}>{cnt}</button>;
+}
+function B() {
+  const [cnt] = useS(store.globalCounter);
+  return <p>{cnt}</p>;
+}
+"""
+derivedState = """
+type Cart = { cart: number[]; total: (c:number[])=>number };
+const initial: Cart = { cart: [1,2], total: c=>c.reduce((a,b)=>a+b) };
+function Comp() {
+  const [{ cart, total }, setState] = useS(initial);
+  return <p>Total: {total(cart)}</p>;
+}
+"""
+executableState = """
+// In store.ts
+export const store = {
+  exec: {
+    value: {
+      show: false,
+      C: () => <>Hi</>,
+      D: () => <>Bye</>
+    },
+    key: "exec-key"
+  }
+};
+
+// In ComponentA.tsx
+const [{ show, C, D }, setState] = useS(store.exec);
+return show ? C() : D();
+"""
+
+[notes]
+debugGlobalStore = """
+// In development
+import { debugGlobalStore } from "use-s-react";
+useEffect(() => {
+  debugGlobalStore(); // logs full store
+  debugGlobalStore({ filterKey: 'my-key' });
+}, []);
+"""
+
+[constraints]
+immutable = "Deep and performance-optimized immutability applied automatically."
+typescript = "Fully typed; type inferred from initial value."
+bundle = "<2KB (min+gzip)"
+providers = "No providers or context required"
+
+[limitations]
+persistence = "Not implemented. No built-in storage or persistence."
+devtools = "Debugging via debugGlobalStore; no official DevTools integration."
+getterSetters = "Getters/setters included but not deeply compared; may cause extra re-renders."

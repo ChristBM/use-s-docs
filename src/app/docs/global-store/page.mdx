@@ -1,0 +1,171 @@
+# Global Store
+
+## 🧭 When to Use Global State?
+
+In React applications, properly placing state is essential for performance and maintainability.
+
+Global state is a great choice when:
+
+- Two sibling components need to respond to the same state change.
+- A deeply nested component needs data from high up in the tree.
+- Multiple parts of your app should react to a shared change.
+
+Once you’ve identified that need, `useS` makes managing global state easy and scalable.
+
+---
+
+## 🗂️ Creating a Centralized Store
+
+To stay organized, it’s best practice to centralize your global state config objects (`{ value, key }`) in a `store.ts` file:
+
+```tsx showLineNumbers filename="store.ts" copy /key/ /value/
+export type StoreType = {
+  globalCounter: {
+    value: number;
+    key: string;
+  };
+};
+
+export const store: StoreType = {
+  globalCounter: {
+    value: 0,
+    key: "global-counter",
+  },
+} as const;
+```
+
+Benefits:
+
+- Clear naming and structure
+- Avoid reusing or mistyping keys
+- Easy reuse across components
+
+---
+
+## ⚙️ Using the Global Store in Components
+
+Just import the `store` and use the state:
+
+```tsx showLineNumbers filename="Component.tsx" copy /store/
+import { useS } from "use-s-react";
+import { store } from "./store";
+
+export default function Component() {
+  const [state, setState] = useS(store.globalCounter);
+
+  return <> ... </>;
+}
+```
+
+Any component using `useS(store.globalCounter)` will now share the same state.
+
+---
+
+## 💡 Tip: You Can Still Use the Value Locally
+
+If you're unsure whether a state should be global, you can still use the centralized value as local state:
+
+```tsx showLineNumbers filename="Component.tsx" copy /value/
+import { useS } from "use-s-react";
+import { store } from "./store";
+
+export default function Component() {
+  const [state, setState] = useS(store.globalCounter.value);
+
+  return <> ... </>;
+}
+```
+
+This pattern keeps your state organized and allows flexibility as your app evolves.
+
+---
+
+## 🧾 Example `store.ts` with All Supported Types
+
+This is a complete example of a fully typed store using `StoreType` and all the types `useS` supports:
+
+```tsx showLineNumbers filename="store.ts" copy /store/
+import type { StoreType } from "./types";
+
+export const store: StoreType = {
+  globalCounter: {
+    value: 0,
+    key: "global-counter",
+  },
+  globalBool: {
+    value: true,
+    key: "global-boolean",
+  },
+  globalNull: {
+    value: null,
+    key: "global-null",
+  },
+  globalUndefined: {
+    value: undefined,
+    key: "global-undefined",
+  },
+  globalUser: {
+    value: {
+      name: "John",
+      lastName: "Doe",
+      age: 29,
+      things: ["t-shirt", "tv", ["shoe", "smartphone"]],
+      friend: {
+        name: "Rose",
+        age: 30,
+        book: {
+          title: "Game of JS",
+          pages: 10,
+        },
+      },
+    },
+    key: "global-user",
+  },
+  globalSet: {
+    value: new Set(["apple", "banana", "cherry"]),
+    key: "global-set",
+  },
+  globalMap: {
+    value: new Map<string, string | number>([
+      ["name", "Alice"],
+      ["age", 25],
+      ["job", "Engineer"],
+    ]),
+    key: "global-map",
+  },
+  globalDate: {
+    value: new Date("2025-01-01T00:00:00Z"),
+    key: "global-date",
+  },
+  globalRegExp: {
+    value: /hello-world/gi,
+    key: "global-regexp",
+  },
+  globalArray: {
+    value: [],
+    key: "global-array",
+  },
+  globalArrayScore: {
+    value: [
+      { name: "A", score: 90 },
+      { name: "B", score: 85 },
+      { name: "C", score: 95 },
+    ],
+    key: "global-array-score",
+  },
+  globalCart: {
+    value: {
+      cart: [1, 2, 3, 4],
+      total: function (cart: number[]) {
+        return cart.reduce((sum: number, item: number) => sum + item, 0);
+      },
+    },
+    key: "global-price",
+  },
+} as const;
+```
+
+If this grows too large, you can split it into multiple smaller files.
+`useS` doesn’t lock you into one pattern — it adapts to your architecture.
+
+---

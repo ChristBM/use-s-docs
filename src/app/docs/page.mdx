@@ -1,0 +1,89 @@
+# Why `useS`?
+
+## Simplifying State Management in React
+
+I created `use-s-react` with a clear goal: to make state management in React **easier**, **cleaner**, and **more powerful**.
+
+Most state management libraries today ask too much: new concepts to learn, boilerplate to write, and setup code that bloats your project. Even React's built-in tools like `useState`, `useReducer`, and context don't offer a complete solution that’s both simple and scalable.
+
+So I asked myself:
+
+> What if there were a hook as easy to use as `useState`, but with superpowers?
+
+---
+
+## What's Broken with the Current Approach?
+
+### 1. Sharing Global State is Overcomplicated
+
+To share state across components, you're usually stuck doing this:
+
+- Create a context using `createContext`
+- Define and export a Provider
+- Wrap your app or component tree with the Provider
+- Use `useContext` in each component
+- Optionally write custom hooks to abstract logic
+
+This isn't just verbose—it also introduces re-render traps and scalability headaches.
+
+### 2. `useState` Doesn’t Scale for Real-World Needs
+
+`useState` is great for simple values—but not for:
+
+- Complex data (e.g., deeply nested objects)
+- Built-in immutability
+- Declarative derived state
+
+If you reach for `useReducer`, now you're:
+
+- Learning a new paradigm
+- Writing action types and reducer functions
+- Manually handling immutability
+- Sacrificing simplicity for flexibility
+
+---
+
+## The Answer: `useS`
+
+`useS` was built to offer the best of both worlds:
+
+- ✅ API as intuitive as `useState`
+- ✅ Manage **local and global** state with one line
+- ✅ No context, providers, or boilerplate
+- ✅ Immutable by default—even for complex objects
+- ✅ Support for declarative derived state
+- ✅ Full TypeScript support
+- ✅ Powered by `useSyncExternalStore` for consistency and performance
+
+---
+
+## Why `useSyncExternalStore`?
+
+React 18 introduced `useSyncExternalStore` to provide safe, efficient subscriptions to external stores. It became the perfect foundation for `useS`, delivering:
+
+- **Automatic reactivity** that integrates naturally with React’s lifecycle
+- **Scalability** without relying on third-party libraries
+- **Flexibility** to define local or global state based on your needs
+
+---
+
+## A Dev-Friendly Hook Without the Overhead
+
+After working with nearly every popular state library, I realized none of them nailed the balance between **simplicity** and **power**. So I built one:
+
+> Powerful enough for professionals, simple enough for everyone.
+
+---
+
+## 🚀 Give It a Try
+
+Tired of boilerplate, context, and configuration hell?
+Give `useS` a spin—you might never look back.
+
+And if you find it useful, share it with your team or the community.
+Let’s make React state management **simple again**.
+
+---
+
+🧠 Clean code, no headaches.
+💬 Have feedback or ideas? Contributions are welcome on GitHub!

@@ -1,0 +1,124 @@
+# Derived State
+
+## 🧠 A Common Technique We All Use
+
+You've probably had to compute one piece of state from another — that's **derived state**.
+
+Most state libraries introduce abstractions or custom logic for this.
+`useS` does not.
+
+It lets you use the **JavaScript you already know**.
+No special syntax. No new mental models. Just state and logic.
+
+---
+
+## ⚙️ Using Functions as State Properties
+
+You can define functions as part of your state object:
+
+```tsx showLineNumbers filename="Component.tsx" copy /total/ /thanks/
+import { useS } from "use-s-react";
+
+type CartType = {
+  cart: number[];
+  total: (cart: number[]) => number;
+  thanks: (total: number) => string;
+};
+
+const initialValue: CartType = {
+  cart: [1, 2, 3, 4],
+  total: function (cart: number[]) {
+    return cart.reduce((sum: number, item: number) => sum + item, 0);
+  },
+  thanks: function (total: number) {
+    return `Thanks for your purchase of: ${total}`;
+  },
+};
+
+export default function Component() {
+  const [{ cart, total, thanks }, setState] = useS(initialValue);
+
+  return (
+    <div>
+      <h1>Total: {total(cart)}</h1>
+      <h3>{thanks(total(cart))}</h3>
+
+      <ul>
+        <p>cart:</p>
+        {cart.map((i, index) => (
+          <li key={i + index + "key"}>{i}</li>
+        ))}
+      </ul>
+
+      <button
+        onClick={() =>
+          setState((prev) => ({ cart: [...prev.cart, prev.cart.length + 1] }))
+        }
+      >
+        + 1 Price
+      </button>
+    </div>
+  );
+}
+```
+
+### 🧩 How It Works
+
+- `total` is a function that derives value from `cart`
+- `thanks` is a function that uses the result of `total`
+- React automatically re-renders when state changes, and the functions respond accordingly
+
+This is **derived state**, the `useS` way:
+No `useEffect`, no custom hooks, no `useMemo`. Just logic.
+
+---
+
+## 🧪 Updating Function Keys
+
+Yes — you can also **update** function properties in your state:
+
+```tsx showLineNumbers filename="Component.tsx" copy /thanks/
+import { useS } from "use-s-react";
+
+type CartType = { ... };
+
+const initialValue: CartType = { ... };
+
+export default function Component() {
+  const [{ cart, total, thanks }, setState] = useS(initialValue);
+
+  return (
+    <div>
+      <h3>{thanks(total(cart))}</h3>
+
+      <button
+        onClick={() =>
+          setState(() => ({
+            thanks: function (total: number) {
+              return `Thank you, but you should spend more than: ${total} :)`;
+            },
+          }))
+        }
+      >
+        Say spend more
+      </button>
+    </div>
+  );
+}
+```
+
+This example updates the `thanks` function dynamically — something most libraries don’t support out of the box.
+
+---
+
+## 🌍 Global Derived State
+
+If you need this logic across components, simply place the initial value in your [Global Store](/docs/global-store) and reuse it anywhere via:
+
+```tsx
+const [state] = useS(store.globalCart);
+```
+
+---
+
+With `useS`, derived logic stays **close to your data**, and everything stays **declarative and scalable**.

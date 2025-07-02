@@ -1,0 +1,52 @@
+# `debugGlobalStore()`
+
+Use `debugGlobalStore()` to inspect all global states directly in the developer console.
+
+---
+
+✅ Fully compatible with **React Native** — if `console.table` isn’t available, it will gracefully fall back to `console.log`.
+
+---
+
+## 🧪 Example Usage
+
+```ts copy
+import { debugGlobalStore } from "use-s-react";
+
+useEffect(() => {
+  debugGlobalStore(); // Logs all global keys and values
+
+  debugGlobalStore({ filterKey: "global-user" }); // Logs only the "global-user" state
+
+  debugGlobalStore({ withConsoleTable: false }); // Uses console.log instead of console.table
+}, []);
+```
+
+Make sure to call `debugGlobalStore()` inside a `useEffect` or another lifecycle-safe context.
+
+If you're tracking specific global states, include their values in the `useEffect` dependency array to re-log when they change.
+
+---
+
+## 🔍 Options
+
+- **Inspect all global states**
+
+  ```ts copy
+  debugGlobalStore();
+  ```
+
+- **Inspect a specific key**
+
+  ```ts copy
+  debugGlobalStore({ filterKey: "a-key" });
+  ```
+
+- **Disable `console.table` formatting**
+  ```ts copy
+  debugGlobalStore({ withConsoleTable: false });
+  ```
+
+---
+
+This is a handy tool for development and debugging. For production apps, avoid calling `debugGlobalStore()` unless explicitly needed.

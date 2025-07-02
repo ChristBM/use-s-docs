@@ -1,0 +1,155 @@
+# Executable State
+
+As you may have seen in the [Derived State](/docs/derived-state) section, objects can include functions as keys.
+
+This isn’t new — it’s just JavaScript. And with `useS`, you can:
+
+- Store and render React components directly from state
+- Control or transform values without relying on `setState`
+- Derive one key’s value from another
+
+---
+
+## 🧱 Store and Share Components via State
+
+React allows passing components through `children` or `render props`.
+
+But with `useS`, you can embed components inside state and modify them dynamically — no props needed.
+
+### Example `store.ts`
+
+```tsx showLineNumbers filename="store.ts" copy /Component/
+export type StoreType = { ... };
+
+export const store: StoreType = {
+  globalExecutableState: {
+    value: {
+      show: false,
+      ComponentC() {
+        return <>Hello</>;
+      },
+      ComponentD: function () {
+        return <>Bye</>;
+      },
+    },
+    key: "global-executable-state",
+  },
+};
+```
+
+---
+
+### Component A
+
+```tsx showLineNumbers filename="ComponentA.tsx" copy /Component/
+import { useS } from "use-s-react";
+import { store } from "./store.ts";
+
+export default function ComponentA() {
+  const [{ show, ComponentC, ComponentD }, setState] = useS(
+    store.globalExecutableState
+  );
+
+  return (
+    <div>
+      {show ? ComponentD() : ComponentC()}
+
+      <button
+        onClick={() =>
+          setState({
+            ComponentC: function () {
+              return <>Hi Friend</>;
+            },
+          })
+        }
+      >
+        Change default greeting
+      </button>
+    </div>
+  );
+}
+```
+
+---
+
+### Component B
+
+```tsx showLineNumbers filename="ComponentB.tsx" copy /Component/
+import { useS } from "use-s-react";
+import { store } from "./store.ts";
+
+export default function ComponentB() {
+  const [{ ComponentC }, setState] = useS(store.globalExecutableState);
+
+  return (
+    <div>
+      <button onClick={() => setState((prev) => ({ show: !prev.show }))}>
+        Toggle visibility of components C and D in A
+      </button>
+      ComponentC: {ComponentC()}
+    </div>
+  );
+}
+```
+
+This pattern enables reactive UI without props. You can even call nested components with arguments, or return full components from within state functions.
+
+---
+
+## 🔐 Private State via Getters and Setters
+
+You can also use objects with `get` and `set` methods in `useS`:
+
+```ts showLineNumbers copy {2,8-15}
+const User = {
+  _name: "John",
+  lastName: "Doe",
+  age: 29,
+  greeting() {
+    return "Hello, how are you?";
+  },
+  get name() {
+    return this._name === "John"
+      ? `${this._name} ${this.lastName}`
+      : this._name;
+  },
+  set name(newValue) {
+    this._name = newValue + " M. ";
+  },
+};
+```
+
+These accessors add abstraction to your state — and `useS` fully preserves them.
+
+---
+
+### Example with Get/Set in React
+
+```tsx showLineNumbers filename="GetSet.tsx" copy {10, 13}
+import { useS } from "use-s-react";
+
+const User = { ... };
+
+export default function GetSet() {
+  const [state, setState] = useS(User);
+
+  return (
+    <div>
+      {state.name}
+
+      <button onClick={() => setState({ name: "J" })}>
+        Change name
+      </button>
+    </div>
+  );
+}
+```
+
+Try removing the `get name()` method and watch `state.name` disappear — proving that `useS` respects object behavior.
+
+---
+
+> ⚠️ **Note:** `useS v2.0.0` does **not** perform shallow comparison on `getter/setter` properties.
+> Overuse may lead to unnecessary re-renders — use thoughtfully.
+
+With this approach, you can design **private APIs**, computed state, and reactive logic — all using plain objects and JavaScript.

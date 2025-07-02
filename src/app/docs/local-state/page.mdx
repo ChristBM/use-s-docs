@@ -1,0 +1,167 @@
+# Local State
+
+## 🧩 How to Manage Local State?
+
+`useS` is designed to replace `useState` and improve your local state management with minimal effort.
+
+```tsx showLineNumbers filename="Component.tsx" copy /useS/
+import { useS } from "use-s-react";
+
+export default function Component() {
+  const [state, setState] = useS(false);
+
+  return (
+    <button onClick={() => setState((prev) => !prev)}>
+      {state ? "Es" : "En"}
+    </button>
+  );
+}
+```
+
+---
+
+## 😵 Too Many `useState` Calls?
+
+It's common to see components filled with multiple `useState` declarations:
+
+```tsx showLineNumbers filename="ManyUseStates.tsx" copy {4-8}
+import { useState } from "react";
+
+export default function ManyUseStates() {
+  const [count, setCount] = useState(0);
+  const [show, setShow] = useState(true);
+  const [score, setScore] = useState<number | undefined>(undefined);
+  const [title, setTitle] = useState<string | null>(null);
+  const [list, setlist] = useState<string[]>([]);
+  // and more
+
+  return ...
+}
+```
+
+You could replace each `useState` with `useS`, but you'd still have a bloated list.
+
+---
+
+## ✅ One Object, One `useS`
+
+Instead, consolidate all state into one object:
+
+```tsx showLineNumbers filename="OnlyOneUseS.tsx" copy {20}
+import { useS } from "use-s-react";
+
+type InitialValue = {
+  count: number;
+  show: boolean;
+  score: undefined | number;
+  title: null | string;
+  list: number[];
+};
+
+const initialValue: InitialValue = {
+  count: 0,
+  show: true,
+  score: undefined,
+  title: null,
+  list: [],
+};
+
+export default function OnlyOneUseS() {
+  const [{ count, show, score, title, list }, setState] = useS(initialValue);
+
+  return (
+    <div>
+      <section>
+        {count}
+        <button onClick={() => setState(prev => ({ count: prev.count + 1}))}>+1</button>
+      </section>
+
+      <section>
+        {show ? <p>Hello!</p> : <p>Bye!</p>}
+        <button onClick={() => setState(prev => ({ show: !prev.show}))}>Hello | Bye</button>
+      </section>
+
+      <section>
+        {score}
+        <button onClick={() => setState({ score: 10 })}>Set 10</button>
+      </section>
+
+      <section>
+        {title}
+        <button onClick={() => setState({ title: "Hello useS" })}>Hello useS</button>
+      </section>
+
+      <section>
+        {list.map((i) => (
+          <li key={'key-' + i}>number:{i}</li>
+        ))}
+        <button onClick={() => setState(prev => ({ list: [...prev.list, prev.list.length + 1]}))}>Add 1 Item</button>
+      </section>
+    </div>
+  );
+}
+```
+
+Update only the pieces you need. For example:
+
+```tsx
+setState({ score: 10 });
+```
+
+---
+
+## 🧬 Updating Deeply Nested Object State
+
+```tsx copy
+type User = {
+  name: string;
+  lastName: string;
+  age: number;
+  things: string[];
+  friend: {
+    name: string;
+    age: number;
+    book: {
+      title: string;
+      pages: number;
+    };
+  };
+};
+
+const user: User = {
+  name: "John",
+  lastName: "Doe",
+  age: 29,
+  things: ["t-shirt", "tv"],
+  friend: {
+    name: "Rose",
+    age: 30,
+    book: {
+      title: "Game of JS",
+      pages: 10,
+    },
+  },
+};
+```
+
+Update the nested `friend.age`:
+
+```tsx copy /age/
+setState({ friend: { age: 35 } });
+```
+
+Update `book.title`:
+
+```tsx copy /title/
+setState({ friend: { book: { title: "New Title" } } });
+```
+
+Or use a functional update:
+
+```tsx copy /prev/
+setState((prev) => ({ age: prev.age + 1 }));
+```
+
+---
+
+With `useS`, you don’t need to worry about deeply cloning or merging — it's all handled automatically.
