@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "motion/react";
 import { Callout } from "nextra/components";
 import { Card } from "./card";
@@ -8,7 +9,6 @@ import Local from "./Local.mdx";
 import Global from "./Global.mdx";
 import { Button } from "./button";
 import CopyButton from "./copy-button";
-import Logo from "./logo";
 
 export default function Hero() {
   return (
@@ -18,13 +18,12 @@ export default function Hero() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
       >
-        <h1 className="text-5xl md:text-7xl font-light leading-tight">
-          <Logo />
-        </h1>
-
-        <p className="text-xl md:text-2xl mb-4 max-w-3xl mx-auto font-light leading-relaxed opacity-50">
+        <div className="w-full flex justify-center mb-2.5">
+          <Image src="/logo.png" alt="useS logo" width={200} height={100} />
+        </div>
+        <h1 className="text-xl md:text-2xl mb-4 max-w-3xl mx-auto font-light leading-relaxed opacity-50">
           React Hook for State Management
-        </p>
+        </h1>
       </motion.div>
 
       {/* Quick Start */}

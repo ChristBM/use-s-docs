@@ -1,1 +1,7 @@
 @import "tailwindcss";
+@import 'nextra-theme-docs/style.css';
+@variant dark (&:where(.dark *));
+
+aside {
+  @apply bg-white dark:bg-[#121212];
+}
