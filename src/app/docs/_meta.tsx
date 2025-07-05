@@ -4,7 +4,7 @@ const meta: MetaRecord = {
   index: "Why useS?",
   "getting-started": "Getting Started",
   api: "API",
-  debug: "debugGlobalStore()",
+  debug: "debugGlobalStore",
   '#': {
     title: 'Examples',
     type: 'separator',

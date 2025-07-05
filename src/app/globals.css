@@ -1,7 +1,19 @@
 @import "tailwindcss";
-@import 'nextra-theme-docs/style.css';
+@import "nextra-theme-docs/style.css";
 @variant dark (&:where(.dark *));
 
 aside {
   @apply bg-white dark:bg-[#121212];
+}
+
+:root {
+  --nextra-content-width: 1440px;
+}
+
+main {
+  margin: 0 auto;
+}
+
+main {
+  padding: 0 1rem;
 }
