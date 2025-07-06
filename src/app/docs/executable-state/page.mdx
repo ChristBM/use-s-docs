@@ -10,6 +10,12 @@ This isn’t new — it’s just JavaScript. And with `useS`, you can:
 
 ---
 
+> ⚠️ **Note:** `useS v2.0.0` does **not** compare function-type object keys (such as funtion(), getters, setters, or React components)
+> with their previous values. As a result, updating these keys — whether assigning a new function or the same one —
+> will always trigger a state update and re-render. This behavior aligns with React's default handling of function references.
+
+---
+
 ## 🧱 Store and Share Components via State
 
 React allows passing components through `children` or `render props`.
@@ -39,7 +45,7 @@ export const store: StoreType = {
 
 ---
 
-### Component A
+Component A
 
 ```tsx showLineNumbers filename="ComponentA.tsx" copy /Component/
 import { useS } from "use-s-react";
@@ -72,7 +78,7 @@ export default function ComponentA() {
 
 ---
 
-### Component B
+Component B
 
 ```tsx showLineNumbers filename="ComponentB.tsx" copy /Component/
 import { useS } from "use-s-react";
@@ -95,6 +101,43 @@ export default function ComponentB() {
 This pattern enables reactive UI without props. You can even call nested components with arguments, or return full components from within state functions.
 
 ---
+
+## 🧪 Updating Function Keys
+
+Yes — you can also **update** function properties in your state:
+
+```tsx showLineNumbers filename="Component.tsx" copy /thanks/
+import { useS } from "use-s-react";
+
+type CartType = { ... };
+
+const initialValue: CartType = { ... };
+
+export default function Component() {
+  const [{ cart, total, thanks }, setState] = useS(initialValue);
+
+  return (
+    <div>
+      <h3>{thanks(total(cart))}</h3>
+
+      <button
+        onClick={() =>
+          setState(() => ({
+            thanks: function (total: number) {
+              return `Thank you, but you should spend more than: ${total} :)`;
+            },
+          }))
+        }
+      >
+        Say spend more
+      </button>
+    </div>
+  );
+}
+```
+
+This example updates the `thanks` function dynamically — something most libraries don’t support out of the box.
+
 
 ## 🔐 Private State via Getters and Setters
 
@@ -147,9 +190,4 @@ export default function GetSet() {
 
 Try removing the `get name()` method and watch `state.name` disappear — proving that `useS` respects object behavior.
 
----
-
-> ⚠️ **Note:** `useS v2.0.0` does **not** perform shallow comparison on `getter/setter` properties.
-> Overuse may lead to unnecessary re-renders — use thoughtfully.
-
-With this approach, you can design **private APIs**, computed state, and reactive logic — all using plain objects and JavaScript.
+> With this approach, you can design **private APIs**, computed state, and reactive logic — all using plain objects and **JavaScript**.

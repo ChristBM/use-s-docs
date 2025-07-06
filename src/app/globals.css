@@ -10,10 +10,13 @@ aside {
   --nextra-content-width: 1440px;
 }
 
-main {
-  margin: 0 auto;
+pre > code.nextra-code > span[data-highlighted-line] {
+  background-color: rgba(16, 185, 129, 0.3) !important;
 }
 
-main {
-  padding: 0 1rem;
+pre > code.nextra-code > span mark[data-highlighted-chars] {
+  background-color:rgba(52, 211, 153, 0.3) !important;
+  padding: 3px;
+  margin: 0 2px;
+  border: none;
 }

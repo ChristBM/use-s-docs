@@ -32,7 +32,7 @@ export default function ManyUseStates() {
   const [show, setShow] = useState(true);
   const [score, setScore] = useState<number | undefined>(undefined);
   const [title, setTitle] = useState<string | null>(null);
-  const [list, setlist] = useState<string[]>([]);
+  const [list, setList] = useState<number[]>([]);
   // and more
 
   return ...
@@ -77,12 +77,12 @@ export default function OnlyOneUseS() {
       </section>
 
       <section>
-        {show ? <p>Hello!</p> : <p>Bye!</p>}
+        {show ? "Hello!" : "Bye!"}
         <button onClick={() => setState(prev => ({ show: !prev.show}))}>Hello | Bye</button>
       </section>
 
       <section>
-        {score}
+        {score ? score : ""}
         <button onClick={() => setState({ score: 10 })}>Set 10</button>
       </section>
 
@@ -92,10 +92,12 @@ export default function OnlyOneUseS() {
       </section>
 
       <section>
-        {list.map((i) => (
-          <li key={'key-' + i}>number:{i}</li>
-        ))}
-        <button onClick={() => setState(prev => ({ list: [...prev.list, prev.list.length + 1]}))}>Add 1 Item</button>
+        <ul>
+          {list.map((i) => (
+            <li key={'key-' + i}>number:{i}</li>
+          ))}
+        </ul>
+        <button onClick={() => setState(prev => ({ list: [...prev.list, prev.list.length + 1]}))}>Add Item</button>
       </section>
     </div>
   );

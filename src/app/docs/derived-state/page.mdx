@@ -67,47 +67,10 @@ export default function Component() {
 - `total` is a function that derives value from `cart`
 - `thanks` is a function that uses the result of `total`
 - React automatically re-renders when state changes, and the functions respond accordingly
+- No unnecessary re-renderings
 
 This is **derived state**, the `useS` way:
 No `useEffect`, no custom hooks, no `useMemo`. Just logic.
-
----
-
-## 🧪 Updating Function Keys
-
-Yes — you can also **update** function properties in your state:
-
-```tsx showLineNumbers filename="Component.tsx" copy /thanks/
-import { useS } from "use-s-react";
-
-type CartType = { ... };
-
-const initialValue: CartType = { ... };
-
-export default function Component() {
-  const [{ cart, total, thanks }, setState] = useS(initialValue);
-
-  return (
-    <div>
-      <h3>{thanks(total(cart))}</h3>
-
-      <button
-        onClick={() =>
-          setState(() => ({
-            thanks: function (total: number) {
-              return `Thank you, but you should spend more than: ${total} :)`;
-            },
-          }))
-        }
-      >
-        Say spend more
-      </button>
-    </div>
-  );
-}
-```
-
-This example updates the `thanks` function dynamically — something most libraries don’t support out of the box.
 
 ---
 

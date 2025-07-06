@@ -84,7 +84,7 @@ This pattern keeps your state organized and allows flexibility as your app evolv
 
 This is a complete example of a fully typed store using `StoreType` and all the types `useS` supports:
 
-```tsx showLineNumbers filename="store.ts" copy /store/
+```tsx showLineNumbers filename="store.ts" copy /store/ /key/
 import type { StoreType } from "./types";
 
 export const store: StoreType = {
@@ -165,7 +165,7 @@ export const store: StoreType = {
 } as const;
 ```
 
-If this grows too large, you can split it into multiple smaller files.
-`useS` doesn’t lock you into one pattern — it adapts to your architecture.
+> ⚠️ **Note:** If this grows too large, you can split it into multiple smaller files.
+> `useS` doesn’t lock you into one pattern — it adapts to your architecture.
 
 ---

@@ -22,7 +22,7 @@ const [state, setState] = useS(0);
 
 Creates a **global** state shared across all components using the same `key`.
 
-```ts copy
+```ts copy /value/ /key/
 const [count, setCount] = useS({
   value: 0,
   key: "global-counter",
@@ -57,13 +57,13 @@ const initialValue = {
 };
 ```
 
-### Update with direct override:
+Update with direct override:
 
 ```ts copy /count/
 setGameStats({ info: { count: 0 } });
 ```
 
-### Or with a functional update:
+Or with a functional update:
 
 ```ts copy /prev/
 setGameStats((prev) => ({
@@ -84,6 +84,36 @@ You can store and update the following safely:
 - Plain objects (deep merge supported)
 - Complex types: `Map`, `Set`, `Date`, `RegExp`
 - **Functions** as object properties (they are preserved)
+
+---
+
+## 🔍 Intelligent Comparison and Render Prevention
+
+One of the most powerful optimizations in `useS` is its ability to **prevent unnecessary re-renders** through structural comparison between the previous and the next value.  
+This means that if the value hasn’t changed in a meaningful way, the state won't update and the component won’t re-render.
+
+### How Does It Work?
+
+Internally, `useS` uses a comparison function based on the data type.
+Each supported type has its own mechanism to determine whether a change has occurred:
+
+| Value Type         | Comparison Strategy                                            |
+|--------------------|----------------------------------------------------------------|
+| Primitives         | `Object.is(a, b)`                                              |
+| `Date`             | Compares timestamps using `getTime()`                          |
+| `RegExp`           | Compares `source` and `flags`                                  |
+| `Set`              | Compares size and checks all elements are present              |
+| `Map`              | Compares size and each `key/value` pair                        |
+| `Array`            | Shallow comparison using `array.every(Object.is)`              |
+| `Object`           | Recursive comparison of keys and values, including nested ones |
+
+This allows you to handle complex structures without external tools or manual hacks like `JSON.stringify`.
+
+### ⚠️ Exception: Functions
+
+Although you can include functions as part of your state (e.g., components, methods, or getters), these are **not compared**.   Every time a key with a function value is updated (even if it's the same reference), it is treated as a change, which will **trigger a state update and a re-render**.
+
+This behavior is consistent with how React handles functions and may be optimized in future versions.
 
 ---
 
