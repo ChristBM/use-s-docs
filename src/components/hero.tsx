@@ -19,7 +19,8 @@ export default function Hero() {
         transition={{ duration: 0.8, ease: "easeOut" }}
       >
         <div className="w-full flex justify-center mb-2.5">
-          <Image src="/logo.png" alt="useS logo" width={200} height={100} />
+          <Image src="/logo.png" alt="useS logo" width={200} height={100} className="hidden dark:block" />
+          <Image src="/logo-dark.png" alt="useS logo" width={200} height={100} className="dark:hidden" />
         </div>
         <h1 className="text-xl md:text-2xl mb-4 max-w-3xl mx-auto font-light leading-relaxed opacity-50">
           React Hook for State Management
