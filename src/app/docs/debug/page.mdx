@@ -18,7 +18,7 @@ useEffect(() => {
 
   debugGlobalStore({ filterKey: "global-user" }); // Logs only the "global-user" state
 
-  debugGlobalStore({ withConsoleTable: false }); // Uses console.log instead of console.table
+  debugGlobalStore({ consoleLog: true }); // Uses console.log instead of console.table
 }, []);
 ```
 
@@ -39,12 +39,12 @@ If you're tracking specific global states, include their values in the `useEffec
 - **Inspect a specific key**
 
   ```ts copy
-  debugGlobalStore({ filterKey: "a-key" });
+  debugGlobalStore({ filterKey: "global-key" });
   ```
 
 - **Disable `console.table` formatting**
   ```ts copy
-  debugGlobalStore({ withConsoleTable: false });
+  debugGlobalStore({ consoleLog: true });
   ```
 
 ---

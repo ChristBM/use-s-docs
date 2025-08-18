@@ -2,6 +2,9 @@
 
 The `useS` hook offers a powerful yet minimal API to manage both **local** and **global** state in React — with built-in immutability and TypeScript support.
 
+- State type is automatically inferred from the `initialValue`.
+- Supported types: `null | undefined | number | string | boolean | bigint | function | date | regexp | array | set | map | object`.
+
 ---
 
 ## 🧠 `useS(initialValue: T)`
@@ -11,11 +14,6 @@ Creates a **local** state, just like `useState`, but with enhanced capabilities:
 ```ts copy /useS/ /number/ /initialValue/
 const [state, setState] = useS(0);
 ```
-
-- State type is automatically inferred from the `initialValue`.
-- Supports primitives, objects, arrays, `Map`, `Set`, `Date`, `RegExp`, and more.
-- Automatically applies immutability under the hood.
-
 ---
 
 ## 🌍 `useS({ value: T, key: string })`
@@ -36,84 +34,81 @@ This is functionally identical to local state, but allows cross-component sharin
 - `key` must be a **non-empty unique string**.
 - The **first call** to `useS()` with a given key sets the **initial value**.
 - All subsequent calls with the same key:
+  - **Ignores** the creation of a new state.
   - Share the **same state**.
-  - **Ignore** the `value` parameter.
 - This ensures state consistency without conflicts or duplication — regardless of where or how many times the key is used.
 
 ---
 
 ## 🧬 Built-In Immutability
 
-`useS` performs deep, optimized cloning so you can update nested state safely and declaratively — no need to mutate or manually deep merge.
+- **Immutability at entry**: useS does not work on the memory reference of the initialValue, it only clones it and creates the state.
+- **Immutability at exit**: useS returns a clone of the actual state, which can be mutated from the component, and this mutation does not affect the original state.
 
-```ts copy /count/
-const initialValue = {
-  game: "Call Of useS",
-  info: {
-    count: 0,
-    points: [2, 6, 3, 4],
-  },
-  players: 10,
-};
-```
+With useS, you will always respect React's rule of not mutating state because it lets you do so without consequences and then allows you to use that mutation to update it with setState without risk:
 
-Update with direct override:
+---
 
-```ts copy /count/
-setGameStats({ info: { count: 0 } });
-```
+```tsx copy showLineNumbers filename="Component.tsx" {1,7,8}
+const initialValue = new Set([1, 2, 3, 4]);
 
-Or with a functional update:
+export function Component() {
+  const [mySet, setMySet] = useS(initialValue);
 
-```ts copy /prev/
-setGameStats((prev) => ({
-  info: {
-    count: prev.info.count + 1,
-  },
-}));
+  const handleAddItem = () => {
+    mySet.add(5); // mutating mySet state directly
+    setMySet(mySet); // setting the mutated state to generate a valid change
+  };
+
+  return (
+    <div>
+      <p data-testid="display">Items:{Array.from(mySet).join("-")}</p>
+      <button onClick={handleAddItem}>Add Item</button>
+    </div>
+  );
+}
+
 ```
 
 ---
 
-## ✅ Supported Value Types
+## 🔍 Intelligent Validation and Render Prevention
 
-You can store and update the following safely:
-
-- Primitives: `string`, `number`, `boolean`, `null`, `undefined`
-- Arrays
-- Plain objects (deep merge supported)
-- Complex types: `Map`, `Set`, `Date`, `RegExp`
-- **Functions** as object properties (they are preserved)
-
----
-
-## 🔍 Intelligent Comparison and Render Prevention
-
-One of the most powerful optimizations in `useS` is its ability to **prevent unnecessary re-renders** through structural comparison between the previous and the next value.  
-This means that if the value hasn’t changed in a meaningful way, the state won't update and the component won’t re-render.
+One of the most powerful optimizations in `useS` is its ability to **prevent unnecessary re-renders** through structural comparison between the previous and the next value.
+This means that if the new value is **not different** or is **not supported**, the state will not be updated and the component will **not be re-rendered**.
 
 ### How Does It Work?
 
 Internally, `useS` uses a comparison function based on the data type.
-Each supported type has its own mechanism to determine whether a change has occurred:
+Each supported type has its own mechanism to determine whether a change is valid:
 
 | Value Type         | Comparison Strategy                                            |
 |--------------------|----------------------------------------------------------------|
-| Primitives         | `Object.is(a, b)`                                              |
-| `Date`             | Compares timestamps using `getTime()`                          |
-| `RegExp`           | Compares `source` and `flags`                                  |
-| `Set`              | Compares size and checks all elements are present              |
-| `Map`              | Compares size and each `key/value` pair                        |
-| `Array`            | Shallow comparison using `array.every(Object.is)`              |
-| `Object`           | Recursive comparison of keys and values, including nested ones |
+| All                | `Object.is(a, b)`.                                                |
+| `Date`             | Compares timestamps using `getTime()`.                         |
+| `RegExp`           | Compares `source` and `flags`.                                 |
+| `Set`              | Recursively compares each value.                               |
+| `Map`              | Recursively compares each key and value.                       |
+| `Array`            | Recursively compares each element.                             |
+| `Object`           | Recursively compares keys and values, including nested ones.   |
 
-This allows you to handle complex structures without external tools or manual hacks like `JSON.stringify`.
+This allows you to handle complex structures without external libs or manual hacks like `JSON.stringify`.
 
-### ⚠️ Exception: Functions
+### ⚠️ Exceptions
 
-Although you can include functions as part of your state (e.g., components, methods, or getters), these are **not compared**.   Every time a key with a function value is updated (even if it's the same reference), it is treated as a change, which will **trigger a state update and a re-render**.
+- Functions:
 
-This behavior is consistent with how React handles functions and may be optimized in future versions.
+Although you can include functions as part of your state these are **compared by reference**.
+Every time a key is updated with a function value, it is likely to  **trigger a state update and re-render**.
+
+This behavior is consistent with how React handles functions.
+
+- Initialization values: `null | undefined | [] | {} | new Set() | new Map()`
+
+The validation function recognizes the previous common initialization values, allowing them to be assigned to the state.
+In addition, if the previous value is one of these, it allows the next value to be assigned to the state, checking that it is a compatible value.
+
+
 
 ---
 
@@ -124,11 +119,12 @@ This behavior is consistent with how React handles functions and may be optimize
 | Local state                      | ✅ Complete | Same API as `useState`                                                |
 | Global state                     | ✅ Complete | Shared by `key`, no Provider required                                 |
 | TypeScript support               | ✅ Complete | Fully inferred, no manual typing needed                               |
-| Automatic immutability           | ✅ Complete | Deep cloning with performance optimizations                           |
+| Automatic immutability           | ✅ Complete | Deep cloning at the entrance and exit                                 |
+| Avoid Unnecessary re-renders     | ✅ Complete | Reference or deep value comparison with type validation               |
 | Derived state support            | ✅ Complete | Supports computed state via function properties                       |
 | React 18 compatibility           | ✅ Complete | Uses `useSyncExternalStore`                                           |
 | Web & React Native               | ✅ Complete | Compatible with both                                                  |
-| Bundle size                      | ✅ Tiny     | Less than 2KB (min + gzip)                                            |
+| Bundle size                      | ✅ Small    | 22.9kB Unpacked Size                                                  |
 | Boilerplate-free                 | ✅ Complete | No context, no Provider, no setup                                     |
 | DevTools/debugging               | ⚠️ Partial  | `debugGlobalStore()` available via console                            |
 | Built-in persistence             | ❌ Not yet  | Planned for future versions                                           |

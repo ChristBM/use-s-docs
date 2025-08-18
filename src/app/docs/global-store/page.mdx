@@ -92,9 +92,13 @@ export const store: StoreType = {
     value: 0,
     key: "global-counter",
   },
-  globalBool: {
+  globalBoolean: {
     value: true,
     key: "global-boolean",
+  },
+  globalTitle: {
+    value: "Hello World",
+    key: "global-title",
   },
   globalNull: {
     value: null,
@@ -103,6 +107,10 @@ export const store: StoreType = {
   globalUndefined: {
     value: undefined,
     key: "global-undefined",
+  },
+  globalBigInt: {
+    value: 123n,
+    key: "global-BigInt",
   },
   globalUser: {
     value: {
@@ -141,10 +149,6 @@ export const store: StoreType = {
     value: /hello-world/gi,
     key: "global-regexp",
   },
-  globalArray: {
-    value: [],
-    key: "global-array",
-  },
   globalArrayScore: {
     value: [
       { name: "A", score: 90 },
@@ -160,12 +164,13 @@ export const store: StoreType = {
         return cart.reduce((sum: number, item: number) => sum + item, 0);
       },
     },
-    key: "global-price",
+    key: "global-cart",
   },
-} as const;
+};
+
 ```
 
-> ⚠️ **Note:** If this grows too large, you can split it into multiple smaller files.
+> ⚠️ **Note:** If this grows too large, you can split it into multiple smaller stores.
 > `useS` doesn’t lock you into one pattern — it adapts to your architecture.
 
 ---

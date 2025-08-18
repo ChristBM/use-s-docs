@@ -58,7 +58,7 @@ Docs: https://use-s-react.christbm.dev/docs/debug
 Import: import { debugGlobalStore } from "use-s-react";
 Inspect all global states: debugGlobalStore();
 Inspect a specific key: debugGlobalStore({ filterKey: "a-key" });
-Disable `console.table` formatting: debugGlobalStore({ withConsoleTable: false });
+Enable `console.log` formatting: debugGlobalStore({ consoleLog: true });
 
 This is a handy tool for development and debugging. For production apps, avoid calling `debugGlobalStore()` unless explicitly needed.
 

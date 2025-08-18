@@ -1,4 +1,4 @@
-# Executable State
+# Executable State (For deep-divers only)
 
 As you may have seen in the [Derived State](/docs/derived-state) section, objects can include functions as keys.
 
@@ -10,9 +10,10 @@ This isn’t new — it’s just JavaScript. And with `useS`, you can:
 
 ---
 
-> ⚠️ **Note:** `useS v2.0.0` does **not** compare function-type object keys (such as funtion(), getters, setters, or React components)
-> with their previous values. As a result, updating these keys — whether assigning a new function or the same one —
-> will always trigger a state update and re-render. This behavior aligns with React's default handling of function references.
+> ⚠️ **Note:** `useS v2.1.0` **Does** compare function-type values.
+> In most cases, if function memory references are not handled correctly,
+> the comparison will likely result in them being different, causing a re-render.
+> This behavior is consistent with React's default handling of function references.
 
 ---
 
