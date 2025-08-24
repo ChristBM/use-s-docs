@@ -20,6 +20,20 @@ useS(initialValue: T): Local State
 useS({ value: T, key: string }): Global State (share the value between components using the same key).
 debugGlobalStore(options?):
 
+### Optional Configuration
+
+useS(initialValue: T || { value: T; key: string },
+  {
+    mutableIn?: boolean;
+    mutableOut?: boolean;
+    forceUpdate?: boolean;
+  }
+)
+
+- mutableIn: defaults to false. This ensures immutability on input.
+- mutableOut: defaults to false. This ensures immutability on output.
+- forceUpdate: defaults to false. This means that inside setState, useS validates the new value, and if it’s an object, it treats it as a partial of the previous value and merges it accordingly.
+
 ## Usage
 
 Docs: https://use-s-react.christbm.dev/docs/getting-started

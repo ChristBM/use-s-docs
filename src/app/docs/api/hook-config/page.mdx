@@ -1,0 +1,182 @@
+# Hook Config
+
+useS supports an optional second configuration parameter that gives developers control over the default enhancements the hook provides.
+
+```ts copy /mutableIn/ /mutableOut/ /forceUpdate/
+useS(initialValue: T || { value: T; key: string },
+  {
+    mutableIn?: boolean;
+    mutableOut?: boolean;
+    forceUpdate?: boolean;
+  }
+)
+
+```
+
+- `mutableIn` defaults to false. This means useS creates a clone of the initial value, and that new reference is used to create the state. This ensures immutability on input, allowing the developer to freely mutate the initial value elsewhere in the code without affecting the state. If `mutableIn = true`, useS will use the same reference of the initial value passed into the hook when creating the state.
+
+- `mutableOut` defaults to false. This means useS returns a clone of the original state. This ensures immutability on output, letting you mutate that returned value inside the component without affecting the state. If `mutableOut = true`, useS returns the original state instead.
+
+- `forceUpdate` defaults to false. This means that inside setState, useS validates the new value, and if it’s an object, it treats it as a partial of the previous value and merges it accordingly. If `forceUpdate = true`, anything you pass to setState will be used to update the state, with the same restrictions as React’s default useState.
+
+---
+
+## 🧪 Examples
+
+These options work exactly the same for managing local and global states. To make the explanation easier, we will use simple local states:
+
+#### 1️⃣ Disabling cloning of initialValue at the hook entry point:
+
+```tsx showLineNumbers filename="LocalCounter.tsx" copy /mutableIn/ /mutableOut/ /forceUpdate/
+import { useS } from "use-s-react";
+
+const initialValue = 0;
+
+export default function LocalCounter() {
+  const [count, setCount] = useS(initialValue, { mutableIn: true });
+
+  // You should avoid mutating initialValue in your code with mutableIn = true
+
+  return (
+    <button onClick={() => setCount((prev) => prev + 1)}>
+      You clicked {count} times
+    </button>
+  );
+}
+
+```
+
+#### 2️⃣ Disabling state cloning at hook exit:
+
+```tsx showLineNumbers filename="LocalUser.tsx" copy /mutableIn/ /mutableOut/ /forceUpdate/
+import { useS } from "use-s-react";
+
+const initialValue = {
+  name: "John",
+  age: 20
+};
+
+export default function LocalUser() {
+  const [user, setUser] = useS(initialValue, { mutableOut: true });
+
+  // You should avoid directly mutating the state with mutableOut = true
+
+  return (
+    <div>
+      Name: {user.name}
+      <button onClick={() => setUser({ name: "Alex" })}>
+        Set User Name
+      </button>
+    </div>
+  );
+}
+
+```
+
+#### 3️⃣ Disabling immutability in useS:
+
+```tsx showLineNumbers filename="LocalUser.tsx" copy /mutableIn/ /mutableOut/ /forceUpdate/
+import { useS } from "use-s-react";
+
+const initialValue = {
+  name: "John",
+  age: 20
+};
+
+export default function LocalUser() {
+  const [user, setUser] = useS(initialValue, { mutableIn: true, mutableOut: true });
+
+  // You should avoid directly mutating the initialValue or state
+  // This behavior is equivalent to the default useState in React
+
+  return (
+    <div>
+      Name: {user.name}
+      <button onClick={() => setUser({ name: "Alex" })}>
+        Set User Name
+      </button>
+    </div>
+  );
+}
+
+```
+
+The differences between useS and the default behavior of useState in terms of memory management are that useS by default uses three memory references:
+- The first is where the initialValue was declared (this is used only once).
+- Then there’s the state reference, which is where changes and operations are applied.
+- Finally, there’s the output reference, which is different from the original state reference and allows direct mutations without affecting the original state.
+Therefore, using this configuration gives you the freedom to turn off the immutability optimizations that useS provides by default.
+
+This can be useful in scenarios with very large and complex states, heavy user interaction where performance becomes critical, or when you as a developer are certain that immutability will not be compromised.
+
+As for how useS works by default, these enhancements generally do not cause performance issues and can be used as-is in the vast majority of cases.
+
+
+#### 4️⃣ Disabling validation and partial assignment in states that are objects:
+
+```tsx showLineNumbers filename="LocalUser.tsx" copy /mutableIn/ /mutableOut/ /forceUpdate/
+import { useS } from "use-s-react";
+
+const initialValue = {
+  name: "John",
+  age: 20
+};
+
+export default function LocalUser() {
+  const [user, setUser] = useS(initialValue, { forceUpdate: true });
+
+  // You should pass the complete value of your status when using forceUpdate: true
+  // If you were to do: setUser({ name: “Alex” })} it would NOT cause a partial update of the state
+
+  return (
+    <div>
+      Name: {user.name}
+      <button onClick={() => setUser({...user, name: "Alex" })}>
+        Set User Name
+      </button>
+    </div>
+  );
+}
+
+```
+
+With `forceUpdate: true`, useS stops validating the value passed to setState() and tries to update the state directly with that value.
+Keep in mind that validation helps prevent unnecessary re-renders.
+
+This feature also disables the special handling that useS provides for objects, which normally allows you to perform partial updates without having to pass the entire object, create copies, or apply direct mutations.
+
+In terms of performance, the situation is similar to the other options: there may be very critical cases where it’s worth disabling it, but in most scenarios it will be beneficial.
+
+#### 5️⃣ Use useS as if it were useState (No-optimizations mode):
+
+```tsx showLineNumbers filename="LocalUser.tsx" copy /mutableIn/ /mutableOut/ /forceUpdate/
+import { useS } from "use-s-react";
+
+const initialValue = 0;
+const counterStateConfig = {
+  mutableIn: true,
+  mutableOut: true,
+  forceUpdate: true
+};
+
+export default function LocalCounter() {
+  const [count, setCount] = useS(initialValue, counterConfig);
+
+  // All optimizations are disabled. Useful for primitive states.
+
+  return (
+    <button onClick={() => setCount((prev) => prev + 1)}>
+      You clicked {count} times
+    </button>
+  );
+}
+
+```
+
+There is not much difference in performance between leaving all features at their default settings or disabling them, since the most useful case for this is in primitive states that do not represent a high computational cost.
+
+---
+
+Ready to see it in action?
+
+Explore real-world [Examples](/docs/examples) to see how `useS` can simplify your components.
