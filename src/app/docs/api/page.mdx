@@ -3,7 +3,7 @@
 The `useS` hook offers a powerful yet minimal API to manage both **local** and **global** state in React — with built-in immutability and TypeScript support.
 
 - State type is automatically inferred from the `initialValue`.
-- Supported types: `null | undefined | number | string | boolean | bigint | function | date | regexp | array | set | map | object`.
+- Supported types: `null | undefined | number | string | boolean | bigint | function | asyncfunction | date | regexp | array | set | map | object`.
 
 ---
 
@@ -16,7 +16,7 @@ const [state, setState] = useS(0);
 ```
 ---
 
-## 🌍 `useS({ value: T, key: string })`
+## 🌍 `useS({ value: T; key: string; })`
 
 Creates a **global** state shared across all components using the same `key`.
 
@@ -37,6 +37,25 @@ This is functionally identical to local state, but allows cross-component sharin
   - **Ignores** the creation of a new state.
   - Share the **same state**.
 - This ensures state consistency without conflicts or duplication — regardless of where or how many times the key is used.
+
+---
+### 💿 Persistence  `{ ..., persist?: bolean; }`
+
+Starting with version **2.3.0** of use-s-react, a third optional parameter was added to the global state configuration object called **persist**:
+
+```ts copy /persist/
+const [count, setCount] = useS({
+  value: 0,
+  key: "global-counter",
+  persist: true
+});
+```
+
+- When *persist is set to true*, you are telling useS to use the *browser's localStorage* to read any initial value stored there and assign it to the initial value of the state that already exists, along with any valid changes, before creating the global state for the first time.
+- In addition will *save the change asynchronously in localStorage every time setState* is executed without blocking the main thread.
+- It will allow you, as a developer, to *choose which global states you want to save and which you don't*.
+- Facilitates *debugging* by using the *same key* for the global state in localStorage.
+- This is a completely *optional* parameter and does not affect any previous functionality.
 
 ---
 
@@ -126,8 +145,8 @@ In addition, if the previous value is one of these, it allows the next value to 
 | Web & React Native               | ✅ Complete | Compatible with both                                                  |
 | Bundle size                      | ✅ Small    | 22.9kB Unpacked Size                                                  |
 | Boilerplate-free                 | ✅ Complete | No context, no Provider, no setup                                     |
+| Built-in persistence             | ✅ Complete | Allows you to save and read the global state in localStorage          |
 | DevTools/debugging               | ⚠️ Partial  | `debugGlobalStore()` available via console                            |
-| Built-in persistence             | ❌ Not yet  | Planned for version 2.3.0                                           |
 
 ---
 

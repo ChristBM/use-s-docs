@@ -47,7 +47,7 @@ export const FEATURES = [
   {
     icon: Feather,
     title: "Tiny Bundle",
-    description: "Less than 2KB min+gzip - performance first",
+    description: "Less than 3KB min+gzip - performance first",
     status: "complete",
   },
   {
@@ -75,17 +75,17 @@ export const FEATURES = [
     description: "Enables advanced patterns without breaking existing code",
     status: "complete",
   },
+    {
+    icon: Database,
+    title: "Persistence",
+    description: "Built-in global state persistence",
+    status: "complete",
+  },
   {
     icon: Bug,
     title: "Debug Tools",
     description: "debugGlobalStore() for development insights",
     status: "partial",
-  },
-  {
-    icon: Database,
-    title: "Persistence",
-    description: "Built-in state persistence (coming soon)",
-    status: "planned",
   },
 ];
 

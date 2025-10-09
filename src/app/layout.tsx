@@ -73,7 +73,7 @@ export default async function RootLayout({
       <body>
         <Layout
           banner={
-            <Banner storageKey="some-key">useS v2.2.0 is released 🎉</Banner>
+            <Banner storageKey="some-key">useS v2.3.0 is released 🎉</Banner>
           }
           navbar={
             <Navbar

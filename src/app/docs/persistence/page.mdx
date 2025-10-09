@@ -1,0 +1,70 @@
+# State persistence
+
+## 🤔 What is state persistence?
+
+In modern web applications, it's common to store data in the browser for later use. The most frequently used place for this purpose is the localStorage, and since state is also data, we can store those parts of the state that need to persist even after the page is reloaded.
+
+State persistence is simply the ability provided by the state manager to read and store global state in the localStorage, ensuring that your data remains available across sessions and page reloads.
+
+## 🚨 How does useS implement this new feature?
+
+Without changing the original API, a third optional parameter was added to let the hook know that you want the state to be stored in the localStorage:
+
+```tsx showLineNumbers filename="store.ts" copy /persist/
+export type StoreType = {
+  globalCounter: {
+    value: number;
+    key: string;
+    persist?: boolean;
+  };
+};
+
+export const store: StoreType = {
+  globalCounter: {
+    value: 0,
+    key: "global-counter",
+    persist: true,
+  },
+} as const;
+```
+
+In the example above, useS will **store** the state value that uses the key **"global-counter"** under the same key in the browser’s **localStorage**.
+Additionally, on initialization, it will attempt to **read** any existing value from localStorage and use it as the **initial value** for the global state.
+
+## 👌 Best Practices
+
+Following the previous example, where we have a store.ts file containing all our global states, we simply set persist: true for those states that are worth saving in localStorage.
+Then, we use the hook in our component as usual — no changes needed:
+
+```tsx showLineNumbers filename="Component.tsx" copy /store/
+import { useS } from "use-s-react";
+import { store } from "./store";
+
+export default function Component() {
+  const [state, setState] = useS(store.globalCounter);
+
+  return <> ... </>;
+}
+```
+The line:
+
+`const [state, setState] = useS(store.globalCounter);`
+
+is equivalent to:
+
+`const [state, setState] = useS({ value: 0, key: "global-counter", persist: true });`
+
+but much **cleaner** and more **efficient** — it avoids code repetition and prevents creating new references of the initial value on every re-render.
+With this, useS has everything it needs to handle localStorage automatically.
+
+## ⚙️ Special Cases
+
+- If your state object contains functions, remember that for useS, **the source of truth is always the initial value declared in the code** — therefore, functions are not stored in localStorage.
+
+- useS only validates and compares **non-function** values to ensure **application safety**.
+
+- During initialization, a copy of the initial value is used, and **any valid changes found in localStorage are merged into it**. If nothing is found or the data is corrupted, the initial value is used instead.
+
+- **Writing to localStorage** occurs only when setState is executed, and it happens **asynchronously** to avoid blocking the main thread — it’s treated as a low-priority operation.
+
+- For Date objects, the **ISO 8601** format is used for serialization.

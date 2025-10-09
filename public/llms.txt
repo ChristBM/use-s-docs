@@ -17,12 +17,12 @@ Hook: "useS" for local and global state management
 Function: "debugGlobalStore" to inspect in the console what is in the global status
 
 useS(initialValue: T): Local State
-useS({ value: T, key: string }): Global State (share the value between components using the same key).
+useS({ value: T; key: string; persist?: boolean; }): Global State (share the value between components using the same key).
 debugGlobalStore(options?):
 
 ### Optional Configuration
 
-useS(initialValue: T || { value: T; key: string },
+useS(initialValue: T || { value: T; key: string; persist?: boolean; },
   {
     mutableIn?: boolean;
     mutableOut?: boolean;
@@ -30,6 +30,7 @@ useS(initialValue: T || { value: T; key: string },
   }
 )
 
+- persist: defaults to false. Allows you to save the state in local Storage for that key and read it initially. Ensures the persistence of information in the browser.
 - mutableIn: defaults to false. This ensures immutability on input.
 - mutableOut: defaults to false. This ensures immutability on output.
 - forceUpdate: defaults to false. This means that inside setState, useS validates the new value, and if it’s an object, it treats it as a partial of the previous value and merges it accordingly.

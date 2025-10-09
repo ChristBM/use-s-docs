@@ -9,8 +9,9 @@ const meta: MetaRecord = {
     title: 'Examples',
     type: 'separator',
   },
-  "global-store": "Global Store",
   "local-state": "Local State",
+  "global-store": "Global Store",
+  "persistence": "Persistence",
   "derived-state": "Derived State",
   "executable-state": "Executable State",
 };
