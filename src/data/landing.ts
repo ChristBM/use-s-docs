@@ -71,8 +71,8 @@ export const FEATURES = [
   },
   {
     icon: Sparkles,
-    title: "Modern Patterns",
-    description: "Enables advanced patterns without breaking existing code",
+    title: "SSR Support",
+    description: "Adds seamless SSR compatibility without changing existing behavior",
     status: "complete",
   },
     {
